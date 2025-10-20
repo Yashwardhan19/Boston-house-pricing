@@ -1,24 +1,40 @@
-# ✅ Workflow Name
-name: Deploy to Render
+# 1. Define the name of the workflow as it appears in the Actions tab
+name: Deploy to Render Service
 
-# ✅ Trigger: Jab bhi main branch me push ho
+# 2. Define the trigger event (when the workflow should run)
 on:
   push:
+    # Change 'main' to your primary branch name (e.g., master, production)
     branches:
       - main
+  # Allows you to run the workflow manually from the GitHub Actions tab
+  workflow_dispatch:
 
+# 3. Define the jobs
 jobs:
   deploy:
+    # Use a standard runner
     runs-on: ubuntu-latest
-
+    
+    # Optional: Prevent deployment if previous jobs (like 'test' or 'build') failed
+    # needs: [test_and_build] 
+    
     steps:
-      # 🧩 Step 1: Checkout your repository
-      - name: Checkout repository
+      # Step 1: Check out your repository code
+      - name: Checkout Repository
         uses: actions/checkout@v4
-
-      # 🐳 Step 2: Deploy your app to Render
-      - name: Deploy to Render (Docker)
-        uses: render-examples/deploy-action@v1
+        
+      # Step 2: Deploy to Render using a correct, proven action
+      - name: Trigger Render Deploy
+        # We are using the well-maintained 'johnbeynon/render-deploy-action'
+        uses: johnbeynon/render-deploy-action@v0.0.8 
+        
         with:
-          api_key: ${{ secrets.RENDER_API_KEY }}     # ⚙️ Render API key (from Render account settings)
-          service_id: ${{ secrets.RENDER_SERVICE_ID }} # ⚙️ Render service ID (from Render → Settings → Advanced)
+          # Use the secret name you created in GitHub (RENDER_SERVICE_ID)
+          service-id: ${{ secrets.RENDER_SERVICE_ID }} 
+          
+          # Use the secret name you created in GitHub (RENDER_API_KEY)
+          api-key: ${{ secrets.RENDER_API_KEY }}
+          
+          # Optional: Wait for the deployment to finish before the workflow exits
+          wait-for-success: true
